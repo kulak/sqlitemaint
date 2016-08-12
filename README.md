@@ -36,6 +36,8 @@ API is a single public function:
 
     sqlitemaint.UpgradeSQLite('my.db', 'my')
 
+See [SQLiteMaintainer application](https://github.com/Kulak/sqlitemaintainer) for console application that uses this package.
+
 ## Known Issues
 
 There is no wrapping of script file in a transaction.  If script fails it may leave datbase in an inconsistent state.  Workaround:  apply transaction in the script file itself.
