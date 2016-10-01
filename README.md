@@ -36,7 +36,8 @@ API is a single public function:
 
 ## Usage
 
-    sqlitemaint.UpgradeSQLite('my.db', 'my')
+    backup := true
+    sqlitemaint.UpgradeSQLite('my.db', 'my', backup)
 
 See [SQLiteMaintainer application](https://github.com/Kulak/sqlitemaintainer) for console application that uses this package.
 
