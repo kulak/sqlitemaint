@@ -27,10 +27,12 @@ If script returns an error, then `user_version` pragma is not updated.  This all
 
 API is a single public function:
 
-    func UpgradeSQLite(db_file, sql_dir string) (version int, err error)
+    func UpgradeSQLite(dbFile, sqlDir string,
+        backup bool) (version int, err error)
 
-`db_file` is a name of SQLite database file to create or update;
-`sql_dir` is a directory that contains SQL scripts to create or update database.
+`dbFile` is a name of SQLite database file to create or update;
+`sqlDir` is a directory that contains SQL scripts to create or update database.
+`backup` enables backup of dbFile regardless of weither or not upgrade will occur.  Backed up file will be place into the same directory as `dbFile` and its name will be prefixed with `Copy-of-` prefix.  Algorithm copies file content prior to connection to `dbFile`.  This results in backup on every startup.  (That's something that might be adjusted later).
 
 ## Usage
 
