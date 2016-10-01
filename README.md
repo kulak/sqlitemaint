@@ -27,8 +27,7 @@ If script returns an error, then `user_version` pragma is not updated.  This all
 
 API is a single public function:
 
-    func UpgradeSQLite(dbFile, sqlDir string,
-        backup bool) (version int, err error)
+    func UpgradeSQLite(dbFile, sqlDir string, backup bool) (version int, err error)
 
 `dbFile` is a name of SQLite database file to create or update;
 `sqlDir` is a directory that contains SQL scripts to create or update database.
