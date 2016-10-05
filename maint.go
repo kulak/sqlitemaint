@@ -28,15 +28,15 @@ func UpgradeSQLite(dbFile, sqlDir string, backup bool) (version int, err error) 
 		}
 	}
 
-	db, err := sql.Open("sqlite3", dbFile)
+	dbc, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer dbc.Close()
 
 	query := "pragma user_version"
 	var userVersion int
-	err = db.QueryRow(query).Scan(&userVersion)
+	err = dbc.QueryRow(query).Scan(&userVersion)
 	if err != nil {
 		err = fmt.Errorf("%q: %s", err, query)
 		return
@@ -49,30 +49,54 @@ func UpgradeSQLite(dbFile, sqlDir string, backup bool) (version int, err error) 
 	log.Printf("Checking if version file %v exists.\n", fileName)
 	// loop while file exists
 	for !os.IsNotExist(err) {
-
 		// SQL upgrade file exists
+
+		// create transaction
+		var tx *sql.Tx
+		tx, err = dbc.Begin()
 
 		log.Printf("Processing %v file...\n", fileName)
 		var content []byte
 		content, err = ioutil.ReadFile(fileName)
 		if err != nil {
-			return userVersion - 1, fmt.Errorf("Failed to read %v file content. Error: %v", fileName, err)
+			err = fmt.Errorf("Failed to read %v file content. Error: %v", fileName, err)
+			goto ROLLBACK
 		}
 		query = string(content)
 
-		_, err = db.Exec(query)
+		// execute update script
+		_, err = tx.Exec(query)
 		if err != nil {
-			return userVersion - 1, fmt.Errorf("Failed to execute %v file content. Error: %v", fileName, err)
+			err = fmt.Errorf("Failed to execute %v file content. Error: %v", fileName, err)
+			goto ROLLBACK
 		}
 
 		// pragma values can not be parametrized (in python), so we use sring format and enforce integer value
 		query = fmt.Sprintf("pragma user_version = %v", userVersion)
-		_, err = db.Exec(query)
+		_, err = tx.Exec(query)
 		if err != nil {
-			return userVersion - 1, fmt.Errorf("Failed to update DB version to %v after %v file was executed. Error: %v\n",
-				userVersion, fileName, err)
+			err = fmt.Errorf("Failed to update DB version to %v after %v file was executed. Error: %v\n", userVersion, fileName, err)
+			goto ROLLBACK
 		}
 		log.Printf("Updated to version %v.\n", userVersion)
+
+	ROLLBACK:
+		if err != nil {
+			err2 := tx.Rollback()
+			if err2 != nil {
+				fmt.Printf("Failed to rollback transaction: %s", err2)
+			}
+			return userVersion - 1, err
+		}
+		err := tx.Commit()
+		if err != nil {
+			fmt.Printf("Error on Commit: %s", err)
+			err = tx.Rollback()
+			if err != nil {
+				fmt.Printf("Error on rollback: %s", err)
+				return userVersion - 1, err
+			}
+		}
 
 		userVersion++
 		fileName = fmt.Sprintf("%v/%04d.sql", sqlDir, userVersion)
