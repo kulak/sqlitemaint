@@ -88,7 +88,7 @@ func UpgradeSQLite(dbFile, sqlDir string, backup bool) (version int, err error) 
 			}
 			return userVersion - 1, err
 		}
-		err := tx.Commit()
+		err = tx.Commit()
 		if err != nil {
 			fmt.Printf("Error on Commit: %s", err)
 			err = tx.Rollback()
