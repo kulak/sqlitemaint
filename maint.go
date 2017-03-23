@@ -20,11 +20,13 @@ func UpgradeSQLite(dbFile, sqlDir string, backup bool) (version int, err error) 
 	version = -1
 
 	if backup {
-		dir, file := path.Split(dbFile)
-		backupFile := path.Join(dir, "Copy-of-"+file)
-		err = doBackup(dbFile, backupFile)
-		if err != nil {
-			return
+		if pathExists(dbFile) {
+			dir, file := path.Split(dbFile)
+			backupFile := path.Join(dir, "Copy-of-"+file)
+			err = doBackup(dbFile, backupFile)
+			if err != nil {
+				return
+			}
 		}
 	}
 
@@ -120,4 +122,16 @@ func doBackup(src string, dst string) (err error) {
 		return
 	}
 	return
+}
+
+// PathExists returns true if file or directory exists.
+func pathExists(path string) bool {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true
+	}
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
