@@ -1,5 +1,7 @@
 # sqlitemaint
 
+status: stable and thus does not have many updates.
+
 SQLiteMaint package is a specific SQLite database maintenance algorithm.  It works well for simple database project schemas as long as changes are combined into a one file per DB version.
 
 The database maintenance is based on `user_version` SQLite pragma.  When database is 1st created its `user_version` is set to 1.  1st upgrade brings `user_version` to 2.  Next upgrade brings it to 3 and so on.
