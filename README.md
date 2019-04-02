@@ -43,6 +43,11 @@ API is a single public function:
 
 See [SQLiteMaintainer application](https://github.com/Kulak/sqlitemaintainer) for console application that uses this package.
 
+
+## Alternative
+
+[GO Lang Migrate](https://github.com/golang-migrate/migrate) supports multiple backends.
+
 ## License
 
 MIT
