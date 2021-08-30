@@ -1,6 +1,6 @@
 # sqlitemaint
 
-status: stable and thus does not have many updates.
+status: stable and thus does not have many updates; can be used with go modules.
 
 SQLiteMaint package is a specific SQLite database maintenance algorithm.  It works well for simple database project schemas as long as changes are combined into a one file per DB version.
 
